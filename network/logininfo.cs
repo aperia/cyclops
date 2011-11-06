@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+// TODO: MOVE?
+using System.Security.Cryptography;
+
 namespace Cyclops {
     /*
      * This is the class the holds the login info (username, password)
@@ -33,7 +36,8 @@ namespace Cyclops {
         /// <param name="password">The password of this instance.</param>
         public LoginInfo(string username, string password) {
             name = username;
-            pw = password;
+            //pw = password;
+			pw = GetMd5Sum(password).ToLower(); // TODO: MOVE?
         }
 
         /// <summary>
@@ -51,5 +55,19 @@ namespace Cyclops {
         public string GetUsername() {
             return name;
         }
+		
+		// TODO: MOVE?
+		public static string GetMd5Sum(string str)
+		{
+			byte[] input = ASCIIEncoding.ASCII.GetBytes(str);
+			byte[] output = MD5.Create().ComputeHash(input);
+			
+			StringBuilder sb = new StringBuilder();
+			
+			for (int i = 0; i < output.Length; i++)
+				sb.Append(output[i].ToString("X2"));
+			
+			return sb.ToString();
+		}
     }
 }
