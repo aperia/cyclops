@@ -1,71 +1,87 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
-namespace Cyclops {
-    class Program {
-        private static void Pause() {
-            Tracer.Println("Press enter and any key to continue");
-            Console.ReadLine(); //Lazy pause
-        }
-
-        static void Main(string[] args) {
-
-            /*
-Map map = new Map(4096, 4096);
-map.SetTile(new Position(320, 320, 7), new Tile(null));
-if (map.GetTile(320, 320, 7) == null) {
-    Console.WriteLine("dangz it");
-} else {
-    Console.WriteLine("woohoo");
-}
-
-Player[] players = new Player[20000];
-for (int i = 0; i < players.Length; i++) {
-    players[i] = new Player(new ProtocolSend(new NetworkMessage(null)));
-}
-*/
-            //TODO: REMOVE
-            //Dictionary<ushort, Item> items = new FileHandler().LoadItems(Config.GetPath()
-            //    + "data\\items\\" + "items.bin");
-            //return;
-            //END TODO
-           
-            // Console.WriteLine(uint.MaxValue);
-           // DatabaseHandler dbHandler = new DatabaseHandler();
-           // dbHandler.Connect();
-            //dbHandler.SavePlayer(new Player(null));
-            //dbHandler.Disconnect();
-            //if (true) { return; }
-            /* TEST CODE */
+namespace Cyclops
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			// Print distribution information
+			Tracer.Println("Cyclops 1.0");
+			Tracer.Println("");
+			
 #if DEBUG
-            Tracer.Println("Debug Mode is currently on.");
+			Tracer.Println("Debugging: On!");
 #endif
+			
+			// Load configuration
+			// Remove configuration asm/
+			if (Directory.Exists("asm"))
+				Directory.Delete("asm", true);
+			
+			string configFile = "config.cs";
+			
+			// Read config file in command line argument
+			if (args.Length > 0)
+			{
+				if (!File.Exists(args[0]))
+				{
+					Tracer.Println("Usage: mono cyclops.exe [config file]");
+					Tracer.Println("");
+					Pause();
+					
+					return;
+				}
+				else
+				{
+					configFile = args[0];
+				}
+			}
+			
+			if (!File.Exists(configFile))
+			{
+				// TODO: Create new template config file
+				configFile = "config.cs";
+			}
+			
+			Tracer.Print("Loading configuration [" + configFile + "]: ");
+			
+			try
+			{
+				DynamicCompile compiler = new DynamicCompile();
+				Dictionary<string, string> values = (Dictionary<string, string>) compiler.Compile(configFile, null);
+				
+				Config.Load(values);
+			}
+			catch (Exception e)
+			{
+				Tracer.Println("Failed!");
+				Tracer.Println("");
+				Tracer.Println(e.ToString());
+				Pause();
+				
+				return;
+			}
+			
+			Tracer.Println("Done!");
+			
+			// Start server
+			new Server().Start();
+			
+			Pause();
+			
+			return;
+		}
 
-            Tracer.Print("Loading configuration...");
-            try {
-                DynamicCompile dCompile = new DynamicCompile();
-                Dictionary<string, string> values =
-                    (Dictionary<string, string>)dCompile.Compile("config.cs", null);
-                Config.Load(values); //Load config
-            } catch (Exception e) {
-                Tracer.Println("Unable to load config.");
-                Tracer.Println(e.ToString());
-                Pause();
-                return; //Exit
-            }
-            Tracer.Println(" Done");
-           // try {
-                new Server().Start();
-           // } catch (Exception e) {
-            //    Tracer.Println("Exception thrown!");
-          //      Tracer.Println(e.ToString());
-          //  }
-            /* END TEST CODE */
-           
-            Pause();
-        }
-    }
+		
+		private static void Pause()
+		{
+			Tracer.Println("Press any key to continue... ");
+			Console.ReadLine();
+		}
+	}
 }
