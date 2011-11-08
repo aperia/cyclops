@@ -68,7 +68,6 @@ namespace Cyclops {
                 default:
                     throw new Exception("Invalid call to GetVocationByName()");
             }
-
         }
 		
 		// TODO: REMOVE
@@ -1123,88 +1122,164 @@ namespace Cyclops {
 		{
             lock (lockStatic)
 			{
-				string connectString = "URI=file:data/players.db";
+				string connectTo = "URI=file:data/players.db";
 				
-				IDbConnection dbConnection;
-				dbConnection = (IDbConnection) new SqliteConnection(connectString);
-				dbConnection.Open();
-				
-				if (dbConnection == null || dbConnection.State != ConnectionState.Open)
+				using (IDbConnection connection = new SqliteConnection(connectTo))
 				{
+					connection.Open();
+					
+					if (connection == null || connection.State != ConnectionState.Open)
+					{
 #if DEBUG
-					Tracer.Println("Player database could not be opened." + dbConnection.State);
+						Tracer.Println("Could not open player database: state=" + connection.State);
 #endif
 					
-					return;
+						return;
+					}
+					
+#if DEBUG
+					Tracer.Println("Player database loaded. " + connection.State + " " + connection.ConnectionString);
+#endif
+					
+					using (IDbCommand command = connection.CreateCommand())
+					{
+						string sql = "UPDATE players SET";
+						//sql += ", name=" + Name;
+						//sql += ", password=" + Password;
+						sql += " level=" + Level;
+						sql += ", experience=" + Experience;
+						sql += ", magic_level=" + MagicLevel;
+						sql += ", mana_spent=" + ManaSpent;
+						sql += ", current_hp=" + CurrentHP;
+						sql += ", max_hp=" + MaxHP;
+						sql += ", current_mana=" + CurrentMana;
+						sql += ", max_mana=" + MaxMana;
+						sql += ", current_cap=" + CurrentCapacity;
+						sql += ", max_cap=" + MaxCapacity;
+						sql += ", access=" + "0"; // fix
+						sql += ", gender=" + "0"; // fix
+						sql += ", position_x=" + CurrentPosition.x;
+						sql += ", position_y=" + CurrentPosition.y;
+						sql += ", position_z=" + CurrentPosition.z;
+						sql += ", char_type=" + CharType;
+						sql += ", outfit_upper=" + OutfitUpper;
+						sql += ", outfit_middle=" + OutfitMiddle;
+						sql += ", outfit_lower=" + OutfitLower;
+						sql += ", skill_fist=" + GetSkill(Constants.SKILL_FIST);
+						sql += ", skill_club=" + GetSkill(Constants.SKILL_CLUB);
+						sql += ", skill_sword=" + GetSkill(Constants.SKILL_SWORD);
+						sql += ", skill_axe=" + GetSkill(Constants.SKILL_AXE);
+						sql += ", skill_distance=" + GetSkill(Constants.SKILL_DISTANCE);
+						sql += ", skill_shielding=" + GetSkill(Constants.SKILL_SHIELDING);
+						sql += ", skill_fishing=" + GetSkill(Constants.SKILL_FISHING);	
+						sql += ", skill_tries_fist=" + GetSkillTries(Constants.SKILL_FIST);
+						sql += ", skill_tries_club=" + GetSkillTries(Constants.SKILL_CLUB);
+						sql += ", skill_tries_sword=" + GetSkillTries(Constants.SKILL_SWORD);
+						sql += ", skill_tries_axe=" + GetSkillTries(Constants.SKILL_AXE);
+						sql += ", skill_tries_distance=" + GetSkillTries(Constants.SKILL_DISTANCE);
+						sql += ", skill_tries_shielding=" + GetSkillTries(Constants.SKILL_SHIELDING);
+						sql += ", skill_tries_fishing=" + GetSkillTries(Constants.SKILL_FISHING);
+						sql += ", base_speed=" + BaseSpeed;
+						sql += ", vocation=" + (int)CurrentVocation;
+						
+						// Inventory
+						Stream invStream = new MemoryStream();
+						BinaryWriter bw = new BinaryWriter(invStream);
+						
+						if (inventory[Constants.INV_NECK] != null) {
+							bw.Write((ushort)inventory[Constants.INV_NECK].ItemID);
+							Tracer.Println("INV_NECK: " + (ushort)inventory[Constants.INV_NECK].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_HEAD] != null) {
+							bw.Write((ushort)inventory[Constants.INV_HEAD].ItemID);
+							Tracer.Println("INV_HEAD: " + (ushort)inventory[Constants.INV_HEAD].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_LEFT_HAND] != null) {
+							bw.Write((ushort)inventory[Constants.INV_LEFT_HAND].ItemID);
+							Tracer.Println("INV_LEFT_HAND: " + (ushort)inventory[Constants.INV_LEFT_HAND].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_RIGHT_HAND] != null) {
+							bw.Write((ushort)inventory[Constants.INV_RIGHT_HAND].ItemID);
+							Tracer.Println("INV_RIGHT_HAND: " + (ushort)inventory[Constants.INV_RIGHT_HAND].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_LEGS] != null) {
+							bw.Write((ushort)inventory[Constants.INV_LEGS].ItemID);
+							Tracer.Println("INV_LEGS: " + (ushort)inventory[Constants.INV_LEGS].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_BODY] != null) {
+							bw.Write((ushort)inventory[Constants.INV_BODY].ItemID);
+							Tracer.Println("INV_BODY: " + (ushort)inventory[Constants.INV_BODY].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_FEET] != null) {
+							bw.Write((ushort)inventory[Constants.INV_FEET].ItemID);
+							Tracer.Println("INV_FEET: " + (ushort)inventory[Constants.INV_FEET].ItemID);
+						} else
+							bw.Write((ushort)0);
+						if (inventory[Constants.INV_BACKPACK] != null)
+						{
+							bw.Write((ushort)inventory[Constants.INV_BACKPACK].ItemID);
+							Tracer.Println("INV_BACKPACK: " + (ushort)inventory[Constants.INV_BACKPACK].ItemID);
+							Tracer.Println("INV_BACKPACK_TYPE: " + inventory[Constants.INV_BACKPACK].Type.ToString());
+							// Save backpack items
+							if (inventory[Constants.INV_BACKPACK].Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
+							{
+								Container bpContainer = (Container)inventory[Constants.INV_BACKPACK];
+								bw.Write((byte)bpContainer.GetItems().Count);
+								Tracer.Println("INV_BACKPACK_COUNT: " + (byte)bpContainer.GetItems().Count);
+								List<Item> bpItems = GetItemsInContainer((Container)inventory[Constants.INV_BACKPACK]);
+								
+								foreach (Item i in bpItems)
+								{
+									bw.Write((ushort)i.ItemID);
+									
+									if (i.Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
+									{
+										Container c = (Container)i;
+										bw.Write((byte)c.GetItems().Count);
+									}
+									
+									Tracer.Println("bp: " + i.Name + " (" + i.ItemID + ")");
+								}
+							}
+						} 
+						else
+							bw.Write((ushort)0);
+
+						// backpack items here!
+						
+						
+						Tracer.Println("inventory.Length=" + inventory.Length);
+						
+						invStream.Position = 0;
+						BinaryReader br = new BinaryReader(invStream);
+						
+						byte[] invBuffer = br.ReadBytes((int)invStream.Length);
+						
+						// TODO: REMOVE BASE64, STORE BLOB
+						sql += ", inventory='" + Convert.ToBase64String(invBuffer) + "'";
+						
+						bw.Close();
+						invStream.Dispose();
+						
+						// Close sql command
+						sql += " WHERE name = '" + Name + "'";
+						
+#if DEBUG
+						Tracer.Println("Executing SQL: \n" + sql + "\n");
+#endif
+						Tracer.Println("SAVE BASE64: " + Convert.ToBase64String(invBuffer));
+						
+						// EXECUTE!
+						command.CommandText = sql;
+						command.ExecuteNonQuery();
+					}
 				}
-				
-#if DEBUG
-				Tracer.Println("Player database loaded. " + dbConnection.State + " " + dbConnection.ConnectionString);
-#endif
-				
-				IDbCommand dbCommand = dbConnection.CreateCommand();
-				
-				string query = "UPDATE players SET";
-				//query += ", name=" + Name;
-				//query += ", password=" + Password;
-				query += " level=" + Level;
-				query += ", experience=" + Experience;
-				query += ", magic_level=" + MagicLevel;
-				query += ", mana_spent=" + ManaSpent;
-				query += ", current_hp=" + CurrentHP;
-				query += ", max_hp=" + MaxHP;
-				query += ", current_mana=" + CurrentMana;
-				query += ", max_mana=" + MaxMana;
-				query += ", current_cap=" + CurrentCapacity;
-				query += ", max_cap=" + MaxCapacity;
-				query += ", access=" + "0"; // fix
-				query += ", gender=" + "0"; // fix
-				query += ", position_x=" + CurrentPosition.x;
-				query += ", position_y=" + CurrentPosition.y;
-				query += ", position_z=" + CurrentPosition.z;
-				query += ", char_type=" + CharType;
-				query += ", outfit_upper=" + OutfitUpper;
-				query += ", outfit_middle=" + OutfitMiddle;
-				query += ", outfit_lower=" + OutfitLower;
-				query += ", skill_fist=" + GetSkill(Constants.SKILL_FIST);
-				query += ", skill_club=" + GetSkill(Constants.SKILL_CLUB);
-				query += ", skill_sword=" + GetSkill(Constants.SKILL_SWORD);
-				query += ", skill_axe=" + GetSkill(Constants.SKILL_AXE);
-				query += ", skill_distance=" + GetSkill(Constants.SKILL_DISTANCE);
-				query += ", skill_shielding=" + GetSkill(Constants.SKILL_SHIELDING);
-				query += ", skill_fishing=" + GetSkill(Constants.SKILL_FISHING);	
-				query += ", skill_tries_fist=" + GetSkillTries(Constants.SKILL_FIST);
-				query += ", skill_tries_club=" + GetSkillTries(Constants.SKILL_CLUB);
-				query += ", skill_tries_sword=" + GetSkillTries(Constants.SKILL_SWORD);
-				query += ", skill_tries_axe=" + GetSkillTries(Constants.SKILL_AXE);
-				query += ", skill_tries_distance=" + GetSkillTries(Constants.SKILL_DISTANCE);
-				query += ", skill_tries_shielding=" + GetSkillTries(Constants.SKILL_SHIELDING);
-				query += ", skill_tries_fishing=" + GetSkillTries(Constants.SKILL_FISHING);
-				query += ", base_speed=" + BaseSpeed;
-				query += ", vocation=" + (int)CurrentVocation;
-				// inventory TODO: ALL ITEMS etc
-				query += ", inventory_head=" + "0";//inventory[Constants.INV_HEAD].ItemID;
-				query += ", inventory_neck=" + "0";//inventory[Constants.INV_NECK].ItemID;
-				query += ", inventory_backpack=" + "0";//inventory[Constants.INV_BACKPACK].ItemID;
-				query += ", inventory_body=" + "0";//inventory[Constants.INV_BODY].ItemID;
-				query += ", inventory_right_hand=" + "0";//inventory[Constants.INV_RIGHT_HAND].ItemID;
-				query += ", inventory_left_hand=" + "0";//inventory[Constants.INV_LEFT_HAND].ItemID;
-				query += ", inventory_legs=" + "0";//inventory[Constants.INV_LEGS].ItemID;
-				query += ", inventory_feet=" + "0";//inventory[Constants.INV_FEET].ItemID;
-				
-				query += " WHERE name = '" + Name + "'";
-				
-#if DEBUG
-				Tracer.Println(query);
-#endif
-				
-				dbCommand.CommandText = query;
-				dbCommand.ExecuteNonQuery();
-				
-				dbCommand.Dispose();
-				dbCommand = null;
-				dbConnection.Close();
-				dbConnection = null;
             }
         }
 		
@@ -1367,15 +1442,66 @@ namespace Cyclops {
 				BaseSpeed = reader.GetInt32(reader.GetOrdinal("base_speed"));
 				
 				// TODO: ALL ITEMS ON CHARACTER (BACKPACK, DEPOT ETC)
-				inventory[Constants.INV_HEAD] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_head")));
+				/*inventory[Constants.INV_HEAD] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_head")));
 				inventory[Constants.INV_NECK] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_neck")));
 				inventory[Constants.INV_BACKPACK] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_backpack")));
 				inventory[Constants.INV_BODY] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_body")));
 				inventory[Constants.INV_RIGHT_HAND] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_right_hand")));
 				inventory[Constants.INV_LEFT_HAND] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_left_hand")));
 				inventory[Constants.INV_LEGS] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_legs")));
-				inventory[Constants.INV_FEET] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_feet")));
-
+				inventory[Constants.INV_FEET] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_feet")));*/
+				
+				Tracer.Println("level=" + reader.GetOrdinal("level"));
+				Tracer.Println("inventory=" + reader.GetOrdinal("inventory"));
+				
+				// INVENTORY TODO: Make better woho.
+				string invData = reader.GetString(reader.GetOrdinal("inventory"));
+				Tracer.Println("LOAD BASE64: " + invData);
+				Stream invStream = new MemoryStream(Convert.FromBase64String(invData));
+				BinaryReader br = new BinaryReader(invStream);
+				
+				if (invStream.Length != 0)
+				{
+					inventory[Constants.INV_NECK] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_HEAD] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_LEFT_HAND] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_RIGHT_HAND] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_LEGS] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_BODY] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_FEET] = Item.CreateItem(br.ReadUInt16());
+					inventory[Constants.INV_BACKPACK] = Item.CreateItem(br.ReadUInt16());
+				}
+				
+				// Load backpack items TODO: Doesn't really work, does it? Create method like GetItemsInContainer()
+				if (inventory[Constants.INV_BACKPACK] != null && inventory[Constants.INV_BACKPACK].Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
+				{
+					Container bp = (Container)inventory[Constants.INV_BACKPACK];
+					
+					byte bpItemsCount = br.ReadByte();
+					
+					if (bp.GetItems().Count != 0)
+					{
+						Tracer.Println("WOHO! LOADING FROM BP(2)");
+						for (int i = 0; i < bpItemsCount; i++)
+						{
+							Item newItem = Item.CreateItem(br.ReadUInt16());
+							bp.AddItem(newItem);
+							Tracer.Println("newItem=" + newItem.Name + " (" + newItem.ItemID + ")");
+							if (newItem.Type == 9220)
+							{
+								byte bpBpItemsCount = br.ReadByte();
+								
+								for (int j = 0; j < bpBpItemsCount; j++)
+								{
+									Item newBpItem = Item.CreateItem(br.ReadUInt16());
+									bp.AddItem(newBpItem);
+									Tracer.Println("newBpItem=" + newBpItem.Name + " (" + newBpItem.ItemID + ")");
+								}
+							}
+						}
+					}
+				}
+				
 				reader.Close();
 				reader = null;
 				dbCommand.Dispose();
@@ -1921,5 +2047,21 @@ namespace Cyclops {
                 World.AppendUpdateItem(leftHand);
             }
         }
+		
+		public List<Item> GetItemsInContainer(Container container)
+		{
+			List<Item> itemList = new List<Item>();
+			
+			foreach (Item item in container.GetItems())
+			{
+				itemList.Add(item);
+				
+				if (item.Type == /*Constants.TYPE_CONTAINER*/ 9220) // TODO: WHAT IS THIS? Why not TYPE_CONTAINER?
+					itemList.AddRange(GetItemsInContainer((Container)item));
+			}
+			
+			return itemList;
+		}
     }
+	
 }
