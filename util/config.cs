@@ -200,6 +200,11 @@ namespace Cyclops {
             return "usewith" + System.IO.Path.DirectorySeparatorChar;
         }
 		
+		public static string GetDatabaseName()
+		{
+			return "players.db";
+		}
+		
 		// TODO: REMOVE
         /*public static Position GetActManagerTemple() {
             return new Position(32097, 32219, 7);

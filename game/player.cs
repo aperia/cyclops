@@ -1126,7 +1126,7 @@ namespace Cyclops {
 		{
             lock (lockStatic)
 			{
-				string connectTo = "URI=file:data/players.db";
+				string connectTo = "URI=file:" + Config.GetDataPath() + Config.GetDatabaseName();
 				
 				using (IDbConnection connection = new SqliteConnection(connectTo))
 				{
@@ -1220,9 +1220,7 @@ namespace Cyclops {
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_BACKPACK] != null)
 						{
-
-							
-//							bw.Write((ushort)inventory[Constants.INV_BACKPACK].ItemID);
+							bw.Write((ushort)inventory[Constants.INV_BACKPACK].ItemID);
 //							Tracer.Println("INV_BACKPACK: " + (ushort)inventory[Constants.INV_BACKPACK].ItemID);
 //							Tracer.Println("INV_BACKPACK_TYPE: " + inventory[Constants.INV_BACKPACK].Type.ToString());
 //							// Save backpack items
@@ -1333,7 +1331,7 @@ namespace Cyclops {
 		{
 			lock (lockStatic)
 			{
-				string connectString = "URI=file:data/players.db";
+				string connectString = "URI=file:" + Config.GetDataPath() + Config.GetDatabaseName();
 				
 				IDbConnection dbConnection;
 				dbConnection = (IDbConnection) new SqliteConnection(connectString);
