@@ -18,7 +18,7 @@ namespace Cyclops {
     /// This class handles all incoming connection requests as
     /// well as starting the server.
     /// </summary>
-    class Server {
+    class Server2 {
         private GameWorld world;
         private TcpListener listener;
         private const ushort PROTO_SERVER_OLD = 0x0101;
@@ -142,7 +142,7 @@ namespace Cyclops {
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Server() {
+        public Server2() {
         }
 
         /// <summary>

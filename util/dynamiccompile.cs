@@ -92,7 +92,7 @@ namespace Cyclops {
                     foreach (CompilerError ce in compile.Errors) {
                         text += "Error: " + ce.ToString() + "\n";
                     }
-                    Tracer.Println(text);
+                    Log.WriteLine(text);
                     throw new Exception(text);
                 }
                 module = compile.CompiledAssembly.GetModules()[0];

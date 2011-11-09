@@ -77,7 +77,7 @@ namespace Cyclops {
                     break;
                 default:
 #if DEBUG
-                    Tracer.Println("Invalid quantifier type");
+                    Log.WriteDebug("Invalid quantifier type");
 #endif
                     break;
             }
@@ -115,7 +115,7 @@ namespace Cyclops {
             //Remove starting space, if applicable;
             if (message.StartsWith(EMPTY_SPACE)) {
 #if DEBUG
-                Tracer.Println("Message started with empty space.");
+                Log.WriteDebug("Message started with empty space.");
 #endif
                 message = message.Substring(1);
             }

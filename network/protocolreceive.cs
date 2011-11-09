@@ -17,12 +17,12 @@ namespace Cyclops {
         protected void PrintHeader(NetworkMessage netmsg, ushort header) {
             lock (lockStatic) {
                 string hexString = String.Format("{0:x2}", header);
-                Tracer.Println("Unknown byte header: 0x" + hexString);
-                Tracer.Print("Bytes:");
+                Log.WriteLine("Unknown byte header: 0x" + hexString);
+                Log.Write("Bytes:");
                 for (int i = 0; i < netmsg.GetMessageLength() - 1; i++) {
-                    Tracer.Print(" 0x" + String.Format("{0:x2}", netmsg.GetByte()));
+                    Log.Write(" 0x" + String.Format("{0:x2}", netmsg.GetByte()));
                 }
-                Tracer.Println("");
+                Log.WriteLine("");
             }
         }
 

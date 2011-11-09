@@ -172,7 +172,7 @@ namespace Cyclops {
             Dictionary<ushort, Item> dict = new Dictionary<ushort, Item>();
             BinaryReader bReader = new BinaryReader(File.Open(itemPath, FileMode.Open));
             ushort itemCount = bReader.ReadUInt16();
-            Console.WriteLine("ItemCount: " + itemCount);
+            //Console.WriteLine("ItemCount: " + itemCount);
 
             for (int i = 0; i < itemCount; i++) {
                 ushort id = bReader.ReadUInt16(); //item id
@@ -190,8 +190,8 @@ namespace Cyclops {
                 }
                 if (item.GetAttribute(Constants.ATTRIBUTE_CONTAINER_SIZE) != null 
                     && !item.IsOfType(Constants.TYPE_CONTAINER)) {
-                    Console.WriteLine("Item: " + item.Name + " is a container"
-                        + " but does not have a container type.");
+                    /*Console.WriteLine("Item: " + item.Name + " is a container"
+                        + " but does not have a container type.");*/
                     }
                 if (!dict.ContainsKey(id)) {
                     dict.Add(id, item);

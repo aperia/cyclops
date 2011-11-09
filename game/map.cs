@@ -249,7 +249,7 @@ namespace Cyclops {
                 tile = new Tile(ground);
                 for (int i = 1; i < vals.Length; i++) {
                     if (vals[i] == 0) {
-                        Tracer.Println("Invalid ID at position x: " + x + " y: " + y + " z: " + z);
+                        Log.Write("Invalid ID at position x: " + x + " y: " + y + " z: " + z);
                     } else {
                         Item item = Item.CreateItem(vals[i]);
                         item.CurrentPosition = new Position((ushort)x, (ushort)y, z);

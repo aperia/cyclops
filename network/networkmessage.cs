@@ -338,7 +338,7 @@ namespace Cyclops {
 
             if (!socket.Connected) {
 #if DEBUG
-                Tracer.Println("Attempting to write to a closed socket.");
+                Log.WriteDebug("Attempting to write to a closed socket.");
 #endif
                 return;
             }

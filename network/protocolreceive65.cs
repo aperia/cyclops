@@ -55,8 +55,8 @@ namespace Cyclops {
         private void ProcessAutoWalk(Player player, GameWorld world) {
             Position pos = netmsg.GetPosition();
 #if DEBUG
-            Tracer.Println("In ProcessAutoWalk()");
-            Tracer.Println("pos: " + pos);
+            Log.WriteDebug("In ProcessAutoWalk()");
+            Log.WriteDebug("pos: " + pos);
 #endif
             world.HandleAutoWalk(player, pos);
         }
@@ -70,8 +70,8 @@ namespace Cyclops {
             //Position player is looking at
             Position pos = netmsg.GetPosition();
 #if DEBUG
-            Tracer.Println("In ProcessLookAt()");
-            Tracer.Println("pos: " + pos);
+            Log.WriteDebug("In ProcessLookAt()");
+            Log.WriteDebug("pos: " + pos);
 #endif
             world.HandleLookAt(player, pos);
         }
@@ -95,9 +95,9 @@ namespace Cyclops {
             FightMode fightMode = (FightMode)rawFightMode;
             FightStance fightStance = (FightStance)rawFightStance;
 #if DEBUG
-            Tracer.Println("In ProcessChangeMode()");
-            Tracer.Println("fightMode: " + fightMode);
-            Tracer.Println("fightStance: " + fightStance);
+            Log.WriteDebug("In ProcessChangeMode()");
+            Log.WriteDebug("fightMode: " + fightMode);
+            Log.WriteDebug("fightStance: " + fightStance);
 #endif
             world.HandleChangeMode(player, fightMode, fightStance);
         }
@@ -109,7 +109,7 @@ namespace Cyclops {
         /// <param name="world">A reference to the gameworld.</param>
         private void ProcessExitBattle(Player player, GameWorld world) {
 #if DEBUG
-            Tracer.Println("In ProcessExitBattle()");
+            Log.WriteDebug("In ProcessExitBattle()");
 #endif
             world.HandleExitBattle(player);
         }
@@ -128,12 +128,12 @@ namespace Cyclops {
             byte unknownByte = netmsg.GetByte(); //unknown?? TODO: Figure out
 
 #if DEBUG
-            Tracer.Println("In ProcessUseItem()");
-            Tracer.Println("itemType: " + itemType);
-            Tracer.Println("pos: " + pos);
-            Tracer.Println("itemID: " + itemID);
-            Tracer.Println("stackpos: " + stackpos);
-            Tracer.Println("unknownbyte: " + unknownByte);
+            Log.WriteDebug("In ProcessUseItem()");
+            Log.WriteDebug("itemType: " + itemType);
+            Log.WriteDebug("pos: " + pos);
+            Log.WriteDebug("itemID: " + itemID);
+            Log.WriteDebug("stackpos: " + stackpos);
+            Log.WriteDebug("unknownbyte: " + unknownByte);
 #endif
 
             if (itemType == Constants.ITEM_TYPE_USE) {
@@ -143,9 +143,9 @@ namespace Cyclops {
                 ushort spriteIDWith = netmsg.GetU16();
                 byte stackposWith = netmsg.GetByte();
 #if DEBUG
-                Tracer.Println("posWith: " + posWith);
-                Tracer.Println("spriteid with: " + spriteIDWith);
-                Tracer.Println("stackPos: " + stackposWith);
+                Log.WriteDebug("posWith: " + posWith);
+                Log.WriteDebug("spriteid with: " + spriteIDWith);
+                Log.WriteDebug("stackPos: " + stackposWith);
 
 #endif
                 world.HandleUseItemWith(player, itemType, pos, itemID,
@@ -176,8 +176,8 @@ namespace Cyclops {
                 return;
             }
 #if DEBUG
-            Tracer.Println("In ProcessChat()");
-            Tracer.Println("msg: " + msg);
+            Log.WriteDebug("In ProcessChat()");
+            Log.WriteDebug("msg: " + msg);
 #endif
             world.HandleChat(player, msg);
         }
@@ -189,7 +189,7 @@ namespace Cyclops {
         /// <param name="world">A reference to the gameworld.</param>
         private void ProcessBounceBack(Player player, GameWorld world) {
 #if DEBUG
-            Tracer.Println("In ProcessBounceBack()");
+            Log.WriteDebug("In ProcessBounceBack()");
 #endif
             world.HandleBounceBack(player);
         }
@@ -206,12 +206,12 @@ namespace Cyclops {
             Position posTo = netmsg.GetPosition();
             byte count = netmsg.GetByte();
 #if DEBUG
-            Tracer.Println("In ProcessPush()");
-            Tracer.Println("posFrom: " + posFrom);
-            Tracer.Println("thingID: " + thingID);
-            Tracer.Println("stackpos: " + stackpos);
-            Tracer.Println("posTo: " + posTo);
-            Tracer.Println("count: " + count);
+            Log.WriteDebug("In ProcessPush()");
+            Log.WriteDebug("posFrom: " + posFrom);
+            Log.WriteDebug("thingID: " + thingID);
+            Log.WriteDebug("stackpos: " + stackpos);
+            Log.WriteDebug("posTo: " + posTo);
+            Log.WriteDebug("count: " + count);
 #endif
             if (count == 0) {
                 return;
@@ -235,8 +235,8 @@ namespace Cyclops {
 
             direction = (Direction)rawDirection;
 #if DEBUG
-            Tracer.Println("In ProcessWalk()");
-            Tracer.Println("direction: " + direction);
+            Log.WriteDebug("In ProcessWalk()");
+            Log.WriteDebug("direction: " + direction);
 #endif
             world.HandleManualWalk(player, direction);
 
@@ -262,8 +262,8 @@ namespace Cyclops {
 
             direction = (Direction)rawDirection;
 #if DEBUG
-            Tracer.Println("In ProcessChangeDirection()");
-            Tracer.Println("direction: " + direction);
+            Log.WriteDebug("In ProcessChangeDirection()");
+            Log.WriteDebug("direction: " + direction);
 #endif
             world.HandleChangeDirection(player, direction);
         }
@@ -287,10 +287,10 @@ namespace Cyclops {
             byte middle = netmsg.GetByte();
             byte lower = netmsg.GetByte();
 #if DEBUG
-            Tracer.Println("In ProcessSetOutfit()");
-            Tracer.Println("Upper: " + upper);
-            Tracer.Println("Middle: " + middle);
-            Tracer.Println("Lower: " + lower);
+            Log.WriteDebug("In ProcessSetOutfit()");
+            Log.WriteDebug("Upper: " + upper);
+            Log.WriteDebug("Middle: " + middle);
+            Log.WriteDebug("Lower: " + lower);
             
 #endif
             world.HandleSetOutfit(player, lower, middle, upper);
@@ -364,7 +364,7 @@ namespace Cyclops {
         /// <param name="world">A reference to the gameworld.</param>
         private void ProcessLogout(Player player, GameWorld world) {
 #if DEBUG
-            Tracer.Println("In ProcessLogout()");
+            Log.WriteDebug("In ProcessLogout()");
 #endif
             world.HandleLogout(player);
         }

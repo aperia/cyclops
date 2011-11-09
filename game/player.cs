@@ -6,6 +6,10 @@ using System.IO;
 using System.Data;
 using Mono.Data.Sqlite;
 
+// TODO:REMOVE
+using System.Xml; 
+using System.Xml.Serialization;
+
 namespace Cyclops {
     //TODO: Finish
     public class Player : Creature {
@@ -706,7 +710,7 @@ namespace Cyclops {
                 return;
             }
 #if DEBUG
-            Tracer.Println("Player: " + Name + " has spent " + amt + " mana.");
+			Log.WriteDebug("Player " + Name + " has spent " + amt + " mana.");
 #endif
             ManaSpent += amt;
             uint reqMana = GetReqMana((byte)(MagicLevel + 1));
@@ -1007,9 +1011,9 @@ namespace Cyclops {
                 }
             }
 #if DEBUG
-            Tracer.Println("CurrentSkillType: " + GetCurrentSkillType());
-            Tracer.Println("Current skill level: " + skill);
-            Tracer.Println("CalculateAttack: "
+			Log.WriteDebug("CurrentSkillType: " + GetCurrentSkillType());
+            Log.WriteDebug("Current skill level: " + skill);
+            Log.WriteDebug("CalculateAttack: "
                 + CalculateAttack(atk, skill, dmgFactor));
 #endif
             return CalculateAttack(atk, skill, dmgFactor);
@@ -1027,7 +1031,7 @@ namespace Cyclops {
                     int.Parse(shield.GetAttribute(Constants.ATTRIBUTE_DEFENSE));
             }
 #if DEBUG
-            Tracer.Println("CalculateShielding: " + CalculateShielding(defense, GetArmorValue()));
+            Log.WriteDebug("CalculateShielding: " + CalculateShielding(defense, GetArmorValue()));
 #endif
             return CalculateShielding(defense, GetArmorValue());
         }
@@ -1131,14 +1135,14 @@ namespace Cyclops {
 					if (connection == null || connection.State != ConnectionState.Open)
 					{
 #if DEBUG
-						Tracer.Println("Could not open player database: state=" + connection.State);
+						Log.WriteDebug("Could not open player database: state=" + connection.State);
 #endif
 					
 						return;
 					}
 					
 #if DEBUG
-					Tracer.Println("Player database loaded. " + connection.State + " " + connection.ConnectionString);
+					Log.WriteDebug("Player database loaded.");
 #endif
 					
 					using (IDbCommand command = connection.CreateCommand())
@@ -1188,73 +1192,65 @@ namespace Cyclops {
 						
 						if (inventory[Constants.INV_NECK] != null) {
 							bw.Write((ushort)inventory[Constants.INV_NECK].ItemID);
-							Tracer.Println("INV_NECK: " + (ushort)inventory[Constants.INV_NECK].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_HEAD] != null) {
 							bw.Write((ushort)inventory[Constants.INV_HEAD].ItemID);
-							Tracer.Println("INV_HEAD: " + (ushort)inventory[Constants.INV_HEAD].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_LEFT_HAND] != null) {
 							bw.Write((ushort)inventory[Constants.INV_LEFT_HAND].ItemID);
-							Tracer.Println("INV_LEFT_HAND: " + (ushort)inventory[Constants.INV_LEFT_HAND].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_RIGHT_HAND] != null) {
 							bw.Write((ushort)inventory[Constants.INV_RIGHT_HAND].ItemID);
-							Tracer.Println("INV_RIGHT_HAND: " + (ushort)inventory[Constants.INV_RIGHT_HAND].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_LEGS] != null) {
 							bw.Write((ushort)inventory[Constants.INV_LEGS].ItemID);
-							Tracer.Println("INV_LEGS: " + (ushort)inventory[Constants.INV_LEGS].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_BODY] != null) {
 							bw.Write((ushort)inventory[Constants.INV_BODY].ItemID);
-							Tracer.Println("INV_BODY: " + (ushort)inventory[Constants.INV_BODY].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_FEET] != null) {
 							bw.Write((ushort)inventory[Constants.INV_FEET].ItemID);
-							Tracer.Println("INV_FEET: " + (ushort)inventory[Constants.INV_FEET].ItemID);
 						} else
 							bw.Write((ushort)0);
 						if (inventory[Constants.INV_BACKPACK] != null)
 						{
-							bw.Write((ushort)inventory[Constants.INV_BACKPACK].ItemID);
-							Tracer.Println("INV_BACKPACK: " + (ushort)inventory[Constants.INV_BACKPACK].ItemID);
-							Tracer.Println("INV_BACKPACK_TYPE: " + inventory[Constants.INV_BACKPACK].Type.ToString());
-							// Save backpack items
-							if (inventory[Constants.INV_BACKPACK].Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
-							{
-								Container bpContainer = (Container)inventory[Constants.INV_BACKPACK];
-								bw.Write((byte)bpContainer.GetItems().Count);
-								Tracer.Println("INV_BACKPACK_COUNT: " + (byte)bpContainer.GetItems().Count);
-								List<Item> bpItems = GetItemsInContainer((Container)inventory[Constants.INV_BACKPACK]);
-								
-								foreach (Item i in bpItems)
-								{
-									bw.Write((ushort)i.ItemID);
-									
-									if (i.Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
-									{
-										Container c = (Container)i;
-										bw.Write((byte)c.GetItems().Count);
-									}
-									
-									Tracer.Println("bp: " + i.Name + " (" + i.ItemID + ")");
-								}
-							}
+
+							
+//							bw.Write((ushort)inventory[Constants.INV_BACKPACK].ItemID);
+//							Tracer.Println("INV_BACKPACK: " + (ushort)inventory[Constants.INV_BACKPACK].ItemID);
+//							Tracer.Println("INV_BACKPACK_TYPE: " + inventory[Constants.INV_BACKPACK].Type.ToString());
+//							// Save backpack items
+//							if (inventory[Constants.INV_BACKPACK].Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
+//							{
+//								Container bpContainer = (Container)inventory[Constants.INV_BACKPACK];
+//								bw.Write((byte)bpContainer.GetItems().Count);
+//								Tracer.Println("INV_BACKPACK_COUNT: " + (byte)bpContainer.GetItems().Count);
+//								List<Item> bpItems = GetItemsInContainer((Container)inventory[Constants.INV_BACKPACK]);
+//								
+//								foreach (Item i in bpItems)
+//								{
+//									bw.Write((ushort)i.ItemID);
+//									
+//									if (i.Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
+//									{
+//										Container c = (Container)i;
+//										bw.Write((byte)c.GetItems().Count);
+//									}
+//									
+//									Tracer.Println("bp: " + i.Name + " (" + i.ItemID + ")");
+//								}
+//							}
 						} 
 						else
 							bw.Write((ushort)0);
 
 						// backpack items here!
-						
-						
-						Tracer.Println("inventory.Length=" + inventory.Length);
 						
 						invStream.Position = 0;
 						BinaryReader br = new BinaryReader(invStream);
@@ -1269,11 +1265,6 @@ namespace Cyclops {
 						
 						// Close sql command
 						sql += " WHERE name = '" + Name + "'";
-						
-#if DEBUG
-						Tracer.Println("Executing SQL: \n" + sql + "\n");
-#endif
-						Tracer.Println("SAVE BASE64: " + Convert.ToBase64String(invBuffer));
 						
 						// EXECUTE!
 						command.CommandText = sql;
@@ -1351,14 +1342,14 @@ namespace Cyclops {
 				if (dbConnection == null || dbConnection.State != ConnectionState.Open)
 				{
 #if DEBUG
-					Tracer.Println("Player database could not be opened." + dbConnection.State);
+					Log.WriteDebug("Player database could not be opened." + dbConnection.State);
 #endif
 					
 					return false;
 				}
 				
 #if DEBUG
-				Tracer.Println("Player database loaded. " + dbConnection.State + " " + dbConnection.ConnectionString);
+				Log.WriteDebug("Player database loaded.");
 #endif
 				
 				IDbCommand dbCommand = dbConnection.CreateCommand();
@@ -1379,7 +1370,7 @@ namespace Cyclops {
 				if (!reader.Read())
 				{
 #if DEBUG
-					Tracer.Println("Player " + info.GetUsername() + " / " + info.GetPassword() + " does not exists!");
+					Log.WriteDebug("Player " + info.GetUsername() + " / " + info.GetPassword() + " does not exists!");
 #endif
 					
 					reader.Close();
@@ -1451,12 +1442,8 @@ namespace Cyclops {
 				inventory[Constants.INV_LEGS] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_legs")));
 				inventory[Constants.INV_FEET] = Item.CreateItem((ushort)reader.GetInt16(reader.GetOrdinal("inventory_feet")));*/
 				
-				Tracer.Println("level=" + reader.GetOrdinal("level"));
-				Tracer.Println("inventory=" + reader.GetOrdinal("inventory"));
-				
 				// INVENTORY TODO: Make better woho.
 				string invData = reader.GetString(reader.GetOrdinal("inventory"));
-				Tracer.Println("LOAD BASE64: " + invData);
 				Stream invStream = new MemoryStream(Convert.FromBase64String(invData));
 				BinaryReader br = new BinaryReader(invStream);
 				
@@ -1473,8 +1460,8 @@ namespace Cyclops {
 				}
 				
 				// Load backpack items TODO: Doesn't really work, does it? Create method like GetItemsInContainer()
-				if (inventory[Constants.INV_BACKPACK] != null && inventory[Constants.INV_BACKPACK].Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
-				{
+				//if (inventory[Constants.INV_BACKPACK] != null && inventory[Constants.INV_BACKPACK].Type == /*Constants.TYPE_CONTAINER // why doesn't this work?*/ 9220)
+				/*{
 					Container bp = (Container)inventory[Constants.INV_BACKPACK];
 					
 					byte bpItemsCount = br.ReadByte();
@@ -1500,7 +1487,7 @@ namespace Cyclops {
 							}
 						}
 					}
-				}
+				}*/
 				
 				reader.Close();
 				reader = null;

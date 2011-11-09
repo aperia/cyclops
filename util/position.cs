@@ -129,7 +129,7 @@ namespace Cyclops {
                     pos.x--;
                     break;
                 default:
-                    Tracer.Println("Unknown direction: " + direction);
+                    Log.WriteLine("Unknown direction: " + direction);
                     break;
             }
             return pos;
